@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test</title>
+</head>
+<body>
+    <button onclick="Read()"> Read Data </button> 
+    <button onclick="Create()"> Create Data </button>
+    <button onclick="Delete()"> Delete Data </button>
+    <button onclick="Update()"> Update Data </button>
+    <div id="output"></div>
+</body>
+
+<script type="module">
+import { Database } from "./Database.js";
+
+async function Read() {
+    const data = await Database.Read(prompt("Enter API Key:"));
+    console.log("Data:", data);
+    document.getElementById("output").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`; 
+}
+
+async function Create() {
+    const response = await Database.Create(prompt("Enter API Key:"), JSON.parse(prompt("Enter data to create:")));
+    console.log("Created:", response);
+}
+
+async function Update() {
+    const response = await Database.Update(prompt("Enter API Key:"), JSON.parse(prompt("Enter data to update:")));
+    console.log("Updated:", response);
+}
+
+async function Delete() {
+    const response = await Database.Delete(prompt("Enter API Key:"));
+    console.log("Deleted:", response);
+}
+
+// Attach functions to window object
+window.Read = Read;
+window.Create = Create;
+window.Update = Update;
+window.Delete = Delete;
+</script>
+</html>
