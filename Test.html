@@ -10,31 +10,110 @@
     <button onclick="Create()"> Create Data </button>
     <button onclick="Delete()"> Delete Data </button>
     <button onclick="Update()"> Update Data </button>
+    <br><br><br>
     <div id="output"></div>
 </body>
-
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
 <script type="module">
 import { Database } from "./Database.js";
 
-async function Read() {
-    const data = await Database.Read(prompt("Enter API Key:"));
-    console.log("Data:", data);
-    document.getElementById("output").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`; 
+async function Read(apiKey) {
+    var data = [];
+    if (apiKey === undefined) {
+        data = await Database.Read(prompt("Enter API Key:"));
+    } else {
+        data = await Database.Read(apiKey);
+    }
+    if (data === undefined || data === null || data.length === 0) {
+        // If no data is found, display a message
+        document.getElementById('output').innerHTML = 'No data found.';
+        return;
+    }
+    const csv = jsonToCsv(data);
+    // Display the CSV data in a HTML table element
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+    const headers = Object.keys(data[0]);
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        headers.forEach(header => {
+            const td = document.createElement('td');
+            td.textContent = item[header];
+            row.appendChild(td);
+        });
+        table.appendChild(row);
+    });
+    document.getElementById('output').innerHTML = ''; // Clear previous output
+    document.getElementById('output').appendChild(table); // Append new table
 }
 
 async function Create() {
-    const response = await Database.Create(prompt("Enter API Key:"), JSON.parse(prompt("Enter data to create:")));
+    const apiKey = prompt("Enter API Key:");
+    if (apiKey === undefined) {
+        alert("API Key is required for creation.");
+        return;
+    }
+    const response = await Database.Create(apiKey, JSON.parse(prompt("Enter data to enter:")));
+    Read(apiKey); // Refresh the data after creation
     console.log("Created:", response);
 }
 
 async function Update() {
-    const response = await Database.Update(prompt("Enter API Key:"), JSON.parse(prompt("Enter data to update:")));
+    const apiKey = prompt("Enter API Key:");
+    if (apiKey === undefined) {
+        alert("API Key is required for update.");
+        return;
+    }
+    const response = await Database.Update(apiKey, JSON.parse(prompt("Enter data to update:")));
+    Read(apiKey); // Refresh the data after update
     console.log("Updated:", response);
 }
 
 async function Delete() {
-    const response = await Database.Delete(prompt("Enter API Key:"));
+    const response = await Database.Delete(prompt("Remove API Key:"));
+    document.getElementById('output').innerHTML = '';
     console.log("Deleted:", response);
+}
+
+function jsonToCsv(jsonData) {
+    let csv = '';
+    
+    // Extract headers
+    const headers = Object.keys(jsonData[0]);
+    csv += headers.join(',') + '\n';
+    
+    // Extract values
+    jsonData.forEach(obj => {
+        const values = headers.map(header => obj[header]);
+        csv += values.join(',') + '\n';
+    });
+    
+    return csv;
 }
 
 // Attach functions to window object
