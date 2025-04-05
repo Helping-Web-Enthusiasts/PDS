@@ -1,4 +1,4 @@
-const Server = "https://script.google.com/macros/s/AKfycbwl4Bfldw3afwufNGS3V2Q9QHA9RECioeigwNMI-wi71LZRkIdv0tWB0WBcHJIVbcy2Yg/exec"; // Replace with your Google Apps Script Web App URL
+const Server = "https://script.google.com/macros/s/AKfycbwl4Bfldw3afwufNGS3V2Q9QHA9RECioeigwNMI-wi71LZRkIdv0tWB0WBcHJIVbcy2Yg/exec";
 
 const Database = {
     request: async (type, apiKey, data = null) => {
