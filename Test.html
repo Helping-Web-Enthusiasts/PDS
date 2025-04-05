@@ -38,8 +38,13 @@ import { Database } from "./Database.js";
 
 async function Read(apiKey) {
     var data = [];
-    if (apiKey === undefined) {
-        data = await Database.Read(prompt("Enter API Key:"));
+    if (apiKey === "" || apiKey === undefined || apiKey === null) {
+        const apiKey = prompt("Enter API Key:");
+        if (apiKey === ""|| apiKey === undefined || apiKey === null) {
+            alert("API Key is required for reading data.");
+            return;
+        }
+        data = await Database.Read(apiKey);
     } else {
         data = await Database.Read(apiKey);
     }
@@ -73,11 +78,12 @@ async function Read(apiKey) {
 }
 
 async function Create() {
-    const apiKey = prompt("Enter API Key:");
-    if (apiKey === undefined) {
-        alert("API Key is required for creation.");
-        return;
-    }
+    const apiKey = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, // random integer between 0 and 15
+        v = c === 'x' ? r : (r & 0x3 | 0x8); // bitwise operations to handle 'y' and 'x'
+        return v.toString(16);
+    }); 
+    prompt("Copy the below API Key to perform CRUD operations on your data: ", apiKey);
     const response = await Database.Create(apiKey, JSON.parse(prompt("Enter data to enter:")));
     Read(apiKey); // Refresh the data after creation
     console.log("Created:", response);
@@ -85,7 +91,7 @@ async function Create() {
 
 async function Update() {
     const apiKey = prompt("Enter API Key:");
-    if (apiKey === undefined) {
+    if (apiKey === "" || apiKey === undefined || apiKey === null) {
         alert("API Key is required for update.");
         return;
     }
@@ -95,7 +101,11 @@ async function Update() {
 }
 
 async function Delete() {
-    const response = await Database.Delete(prompt("Remove API Key:"));
+    const apiKey = prompt("Remove API Key:");
+    if (apiKey === "" || apiKey === undefined || apiKey === null) {
+        alert("API Key is required for deletion.");
+        return;
+    }
     document.getElementById('output').innerHTML = '';
     console.log("Deleted:", response);
 }
